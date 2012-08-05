@@ -18,8 +18,10 @@ package com.github.rakama.sc2mc.io;
 
 public class Segment
 {
+    static final int max_buffer_size = 65536;
+
     String name;
-    byte[] raw;
+    byte[] raw, decompressed;
     
     protected Segment(String name, byte[] raw)
     {
@@ -36,9 +38,53 @@ public class Segment
     {
         return raw;
     }
+
+    public byte[] getDecompressedData()
+    {
+        return decompressed;
+    }
     
-    public int getSize()
+    public void decompressData()
+    {        
+        byte[] buffer = new byte[max_buffer_size];
+        
+        int size = 0;
+        int index = 0;
+        while(index < raw.length)
+        {
+            int count = 0xFF & raw[index++];
+                        
+            if(count == 0 || count == 128)
+                throw new RuntimeException("Invalid compression format!");
+            
+            if(count < 128)
+            {
+                for(int j=0; j<count; j++)
+                    buffer[size++] = raw[index++];
+            }
+            else
+            {
+                count -= 127;
+                byte val = raw[index++];                
+                for(int j=0; j<count; j++)
+                    buffer[size++] = val;
+            }
+        }
+
+        decompressed = new byte[size];
+        System.arraycopy(buffer, 0, decompressed, 0, size);
+    }
+    
+    public int getRawSize()
     {
         return raw.length;
+    }
+
+    public int getDecompressedSize()
+    {
+        if(decompressed == null)
+            return -1;
+        
+        return decompressed.length;
     }
 }
