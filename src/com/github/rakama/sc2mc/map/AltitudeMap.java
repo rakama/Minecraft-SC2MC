@@ -5,13 +5,13 @@ public class AltitudeMap
     public static int width = 128;
     public static int height = 128;
     
-    int[] altitude;
-    boolean[] water;
+    int[] terrain;
+    int[] water;
     
     public AltitudeMap(byte[] data)
     {
-        altitude = new int[128 * 128];
-        water = new boolean[128 * 128];
+        terrain = new int[128 * 128];
+        water = new int[128 * 128];
         
         for(int x=0; x<width; x++)
         {
@@ -19,8 +19,8 @@ public class AltitudeMap
             {
                 int value = getUInt16(data, x, y);
                 int index = toIndex(x, y);
-                altitude[index] = value & 0xF;
-                water[index] = (value & 0x80) != 0;
+                terrain[index] = value & 0xF;
+                water[index] =  (value >> 5) & 0xF;
             }
         }
     }
@@ -35,13 +35,13 @@ public class AltitudeMap
         return height;
     }
     
-    public int getAltitude(int x, int y)
+    public int getTerrainAltitude(int x, int y)
     {
         checkBounds(x, y);
-        return altitude[toIndex(x, y)];
+        return terrain[toIndex(x, y)];
     }
     
-    public boolean isWater(int x, int y)
+    public int getWaterAltitude(int x, int y)
     {
         checkBounds(x, y);
         return water[toIndex(x, y)];

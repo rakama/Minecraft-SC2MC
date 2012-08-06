@@ -8,6 +8,7 @@ import com.github.rakama.sc2mc.map.AltitudeMap;
 import com.github.rakama.sc2mc.map.SC2Map;
 import com.github.rakama.worldtools.WorldTools;
 import com.github.rakama.worldtools.canvas.BlockCanvas;
+import com.github.rakama.worldtools.data.Biome;
 import com.github.rakama.worldtools.data.Block;
 
 
@@ -31,7 +32,7 @@ public class SC2MC
 {
     static int grid_scale = 16;
     
-    static String input = "C:/Program Files (x86)/GOG.com/SimCity 2000 Special Edition/CUSTOM/TEST.SC2";
+    static String input = "C:/Program Files (x86)/GOG.com/SimCity 2000 Special Edition/CUSTOM/TESTFLOO.SC2";
     static String output = "C:/Users/My Computer/AppData/Roaming/.minecraft/saves/sc2test";
     
     public static void main(String[] args) throws IOException
@@ -49,37 +50,35 @@ public class SC2MC
         
         for(int x=0; x<128; x++)
             for(int y=0; y<128; y++)
-                renderGrid(canvas, x, y, alt.getAltitude(x, y), alt.isWater(x, y));
+                renderGrid(canvas, x, y, alt.getTerrainAltitude(x, y), alt.getWaterAltitude(x, y));
     }
     
-    public static void renderGrid(BlockCanvas canvas, int x0, int y0, int altitude, boolean water)
+    public static void renderGrid(BlockCanvas canvas, int x0, int y0, int terrain, int water)
     {
         int xStart = x0 * grid_scale - 64 * grid_scale;
         int yStart = y0 * grid_scale - 64 * grid_scale;
         int xEnd = xStart + grid_scale;
         int yEnd = yStart + grid_scale;
         
-        altitude *= grid_scale;
-        
+        terrain *= grid_scale;
+        water *= grid_scale;
+                
         System.out.println("Reticulating (" + x0 + ", " + y0 + ") ...");
         
         for(int x=xStart; x<xEnd; x++)
             for(int y=yStart; y<yEnd; y++)
-                renderColumn(canvas, x, y, altitude, water);
+                renderColumn(canvas, x, y, terrain, water);
     }
     
-    public static void renderColumn(BlockCanvas canvas, int x, int y, int altitude, boolean water)
-    {
-        Block block;
-        
-        if(water)
-            block = Block.WATER;
-        else
-            block = Block.SANDSTONE;
-        
+    public static void renderColumn(BlockCanvas canvas, int x, int y, int altitude, int water)
+    {        
         for(int height=1; height<altitude; height++)
-            canvas.setBlock(x, height, y, block);
+            canvas.setBlock(x, height, y, Block.SANDSTONE);
+        
+        for(int height=altitude; height<water; height++)
+            canvas.setBlock(x, height, y, Block.WATER);
         
         canvas.setBlock(x, 0, y, Block.BEDROCK);
+        canvas.setBiome(x, y, Biome.FOREST);
     }
 }
