@@ -11,7 +11,6 @@ import com.github.rakama.worldtools.canvas.BlockCanvas;
 import com.github.rakama.worldtools.data.Biome;
 import com.github.rakama.worldtools.data.Block;
 
-
 /**
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
@@ -46,28 +45,33 @@ public class SC2MC
     
     public static void renderHeightmap(BlockCanvas canvas, SC2Map map)
     {
-        AltitudeMap alt = map.getAltitudeMap();
-        
         for(int x=0; x<128; x++)
             for(int y=0; y<128; y++)
-                renderGrid(canvas, x, y, alt.getTerrainAltitude(x, y), alt.getWaterAltitude(x, y));
+                renderGrid(canvas, map, x, y);
     }
     
-    public static void renderGrid(BlockCanvas canvas, int x0, int y0, int terrain, int water)
+    public static void renderGrid(BlockCanvas canvas, SC2Map map, int x0, int y0)
     {
         int xStart = x0 * grid_scale - 64 * grid_scale;
         int yStart = y0 * grid_scale - 64 * grid_scale;
         int xEnd = xStart + grid_scale;
         int yEnd = yStart + grid_scale;
-        
-        terrain *= grid_scale;
-        water *= grid_scale;
+                
+        AltitudeMap alt = map.getAltitudeMap();
+        int water = alt.getWaterAltitude(x0, y0) * grid_scale;
                 
         System.out.println("Reticulating (" + x0 + ", " + y0 + ") ...");
         
         for(int x=xStart; x<xEnd; x++)
+        {
             for(int y=yStart; y<yEnd; y++)
+            {
+                float xs = 64 + x / (float)grid_scale;
+                float ys = 64 + y / (float)grid_scale;
+                int terrain = (int)(alt.getSmoothAltitude(xs, ys) * grid_scale);
                 renderColumn(canvas, x, y, terrain, water);
+            }
+        }
     }
     
     public static void renderColumn(BlockCanvas canvas, int x, int y, int altitude, int water)

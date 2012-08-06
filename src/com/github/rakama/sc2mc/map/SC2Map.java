@@ -63,12 +63,17 @@ public class SC2Map
             seg = segin.readSegment(); 
         }
 
-        Segment ALTM = map.getSegment("ALTM");
+        Segment altm = map.getSegment("ALTM");       
+        if(altm == null)
+            throw new IOException("ALTM segment not found!");   
         
-        if(ALTM == null)
-            throw new IOException("ALTM segment not found!");
+        Segment xter = map.getSegment("XTER");
+        if(xter == null)
+            throw new IOException("XTER segment not found!");
+        
+        xter.decompressData();
             
-        map.altitudeMap = new AltitudeMap(ALTM.getRawData());
+        map.altitudeMap = new AltitudeMap(altm.getRawData(), xter.getDecompressedData());
         
         return map;
     }
