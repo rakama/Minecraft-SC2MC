@@ -5,21 +5,36 @@ public class AltitudeMap
     public static final int width = 128;
     public static final int height = 128;
     
-    private static final int[][] slopeData = {
-        {0,0,0,0}, {1,1,0,0}, {0,1,0,1}, {0,0,1,1},
-        {1,0,1,0}, {1,1,0,1}, {0,1,1,1}, {1,0,1,1},
-        {1,1,1,0}, {0,1,0,0}, {0,0,0,1}, {0,0,1,0},
-        {1,0,0,0}, {1,1,1,1} };
+    private enum Rotation{NONE, CLOCKWISE90, CLOCKWISE180, CLOCKWISE270};
+    private enum Slope{HIGH, LOW, SLOPE, CORNER_HIGH, CORNER_LOW};
+    
+    private static final Rotation[] xterRotation = {
+        Rotation.NONE,
+        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
+        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
+        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
+        Rotation.NONE
+    };
+
+    private static final Slope[] xterSlope = {
+        Slope.LOW,
+        Slope.SLOPE, Slope.SLOPE, Slope.SLOPE, Slope.SLOPE, 
+        Slope.CORNER_LOW, Slope.CORNER_LOW, Slope.CORNER_LOW, Slope.CORNER_LOW, 
+        Slope.CORNER_HIGH, Slope.CORNER_HIGH, Slope.CORNER_HIGH, Slope.CORNER_HIGH, 
+        Slope.HIGH,
+    };
     
     int[] terrain;
     int[] water;
-    int[][] slope;
+    Slope[] slope;
+    Rotation[] rotation;
     
     public AltitudeMap(byte[] altm, byte[] xter)
     {
         terrain = new int[width * height];
         water = new int[width * height];
-        slope = new int[width * height][];
+        slope = new Slope[width * height];
+        rotation = new Rotation[width * height];
         
         for(int x=0; x<width; x++)
         {
@@ -27,10 +42,10 @@ public class AltitudeMap
             {
                 int index = toIndex(x, y);
                 
-                int altitudeData = getAltitudeData(altm, x, y);
-                terrain[index] = altitudeData & 0xF;
-                water[index] =  (altitudeData >> 5) & 0xF;                
-                slope[index] = getSlopeData(xter, x, y);
+                terrain[index] = getTerrainAltitude(altm, x, y);
+                water[index] =  getWaterAltitude(altm, x, y);                
+                slope[index] = getSlopeType(xter, x, y);            
+                rotation[index] = getSlopeRotation(xter, x, y);
             }
         }
     }
@@ -58,17 +73,50 @@ public class AltitudeMap
         
         checkBounds(xi, yi);
 
-        int index = toIndex(xi, yi);
-        int[] corner = slope[index];        
+        int index = toIndex(xi, yi);  
         float altitude = terrain[index];
         
+        float temp;
         float xf = x - xi;
         float yf = y - yi;
         
-        altitude += corner[0] * (1 - xf) * (1 - yf);
-        altitude += corner[1] * xf * (1 - yf);
-        altitude += corner[2] * (1 - xf) * yf;
-        altitude += corner[3] * xf * yf;
+        switch(rotation[index])
+        {
+        case CLOCKWISE90:
+            temp = xf;
+            xf = yf;
+            yf = 1 - temp;
+            break;
+        case CLOCKWISE180:
+            xf = 1 - xf;
+            yf = 1 - yf;
+            break;
+        case CLOCKWISE270:
+            temp = xf;
+            xf = 1 - yf;
+            yf = temp;
+            break;
+        }
+
+        switch(slope[index])
+        {
+        case LOW:
+            return altitude;
+        case HIGH:
+            return altitude + 1;
+        case SLOPE:
+            return altitude + 1 - yf;
+        case CORNER_LOW:
+            if(yf > xf)
+                return altitude + 1 - yf + xf;
+            else
+                return altitude + 1;
+        case CORNER_HIGH:
+            if(yf < xf)
+                return altitude - yf + xf;
+            else
+                return altitude;
+        }
         
         return altitude;
     }
@@ -79,20 +127,31 @@ public class AltitudeMap
         return water[toIndex(x, y)];
     }
 
-    protected static int[] getSlopeData(byte[] data, int x, int y)
+    protected static Slope getSlopeType(byte[] data, int x, int y)
     {
         int index = (127 - x) + (y << 7);
-        return slopeData[0xF & data[index]];        
+        return xterSlope[0xF & data[index]];        
     }
-    
-    protected static int getAltitudeData(byte[] data, int x, int y)
+
+    protected static Rotation getSlopeRotation(byte[] data, int x, int y)
+    {
+        int index = (127 - x) + (y << 7);
+        return xterRotation[0xF & data[index]];        
+    }
+
+    protected static int getTerrainAltitude(byte[] data, int x, int y)
     {
         int index = ((127 - x) + (y << 7)) << 1;
-        int byte1 = 0xFF & data[index];
-        int byte2 = 0xFF & data[index + 1];
-        return (byte1 << 8) | byte2;
+        return data[index + 1] & 0xF;
     }
     
+    protected static int getWaterAltitude(byte[] data, int x, int y)
+    {
+        int index = ((127 - x) + (y << 7)) << 1;
+        int val = data[index + 1] & 0xFF;
+        return (val >> 5) & 0xF;
+    }
+        
     protected static int toIndex(int x, int y)
     {
         return x + (y << 7);
