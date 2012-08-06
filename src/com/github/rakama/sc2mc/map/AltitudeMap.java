@@ -17,11 +17,9 @@ public class AltitudeMap
         {
             for(int y=0; y<height; y++)
             {
+                int value = getUInt16(data, x, y);
                 int index = toIndex(x, y);
-                int byte1 = 0xFF & data[(index << 1)];
-                int byte2 = 0xFF & data[(index << 1) + 1];
-                int value = (byte1 << 8) | byte2;
-                altitude[index] = value & 0x1F;
+                altitude[index] = value & 0xF;
                 water[index] = (value & 0x80) != 0;
             }
         }
@@ -49,18 +47,26 @@ public class AltitudeMap
         return water[toIndex(x, y)];
     }
     
+    protected static int getUInt16(byte[] data, int x, int y)
+    {
+        int index = ((127 - x) + (y << 7)) << 1;
+        int byte1 = 0xFF & data[index];
+        int byte2 = 0xFF & data[index + 1];
+        return (byte1 << 8) | byte2;
+    }
+    
     protected static int toIndex(int x, int y)
     {
         return x + (y << 7);
     }
 
-    protected void checkBounds(int x, int y)
+    protected static void checkBounds(int x, int y)
     {
         if(!inBounds(x, y))
             throw new IndexOutOfBoundsException("(" + x + ", " + y + ")");
     }
 
-    protected boolean inBounds(int x, int y)
+    protected static boolean inBounds(int x, int y)
     {
         return x == (x & 0x7F) && y == (y & 0x7F);
     }
