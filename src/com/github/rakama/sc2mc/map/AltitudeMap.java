@@ -29,7 +29,7 @@ public class AltitudeMap
         Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
         Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
         Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
-        Rotation.NONE
+        Rotation.NONE, Rotation.NONE, Rotation.NONE
     };
 
     private static final Slope[] xterSlope = {
@@ -37,7 +37,7 @@ public class AltitudeMap
         Slope.SLOPE, Slope.SLOPE, Slope.SLOPE, Slope.SLOPE, 
         Slope.CORNER_LOW, Slope.CORNER_LOW, Slope.CORNER_LOW, Slope.CORNER_LOW, 
         Slope.CORNER_HIGH, Slope.CORNER_HIGH, Slope.CORNER_HIGH, Slope.CORNER_HIGH, 
-        Slope.HIGH,
+        Slope.HIGH, Slope.HIGH, Slope.HIGH
     };
     
     int[] terrain;

@@ -32,6 +32,7 @@ public class SC2Map
     int fileSize;
     
     AltitudeMap altitudeMap;
+    StructureMap structureMap;
     
     protected SC2Map(int fileSize)
     {
@@ -72,8 +73,15 @@ public class SC2Map
             throw new IOException("XTER segment not found!");
         
         xter.decompressData();
-            
+
+        Segment xbld = map.getSegment("XBLD");
+        if(xbld == null)
+            throw new IOException("XBLD segment not found!");
+
+        xbld.decompressData();
+
         map.altitudeMap = new AltitudeMap(altm.getRawData(), xter.getDecompressedData());
+        map.structureMap = new StructureMap(xbld.getDecompressedData());
         
         return map;
     }
@@ -110,6 +118,11 @@ public class SC2Map
     {
         return altitudeMap;
     }
+    
+    public StructureMap getStructureMap()
+    {
+        return structureMap;
+    }    
     
     public int getFileSize()
     {
