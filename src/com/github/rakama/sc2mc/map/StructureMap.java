@@ -40,7 +40,8 @@ public class StructureMap
 
     public boolean isRoad(int x, int y)
     {
-        return false;
+        int id = getStructureID(x, y);
+        return id >= 0x1D && id <= 0x2B;
     }
     
     public boolean isEmptyLot(int x, int y)

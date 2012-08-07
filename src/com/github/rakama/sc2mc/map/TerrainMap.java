@@ -134,7 +134,7 @@ public class TerrainMap
 
         float swap;
         
-        // find rotation
+        // rotate coordinate
         switch(rotation)
         {
         case CLOCKWISE90:
@@ -153,7 +153,7 @@ public class TerrainMap
             break;
         }
         
-        // find altitude at this location
+        // find altitude at this coordinate
         switch(type)
         {
         case LOW:
@@ -265,7 +265,7 @@ public class TerrainMap
 
     protected static float getSlope(float xf, float yf)
     {
-        return 1 - yf;
+        return (float)Math.min(1, 1 - yf + 0.05f);
     }
     
     protected static float getCornerLow(float xf, float yf)
@@ -286,7 +286,7 @@ public class TerrainMap
 
     protected static float getFloodedSlope(float xf, float yf)
     {
-        return 1 - yf + 0.05f;
+        return (float)Math.min(1, 1 - yf + 0.05f);
     }
     
     protected static float getFloodedCornerLow(float xf, float yf)
@@ -335,11 +335,11 @@ public class TerrainMap
             return Type.HIGH;
         case 0x3E:
             return Type.WATERFALL;
-        case 0x31: case 0x32: case 0x33: case 0x34:
-        case 0x35: case 0x36: case 0x37: case 0x38:
-        case 0x39: case 0x3A: case 0x3B: case 0x3C:
-        case 0x3D: case 0x40: case 0x41: case 0x42:
-        case 0x43: case 0x44: case 0x45:
+        case 0x30: case 0x31: case 0x32: case 0x33: 
+        case 0x34: case 0x35: case 0x36: case 0x37:
+        case 0x38: case 0x39: case 0x3A: case 0x3B:
+        case 0x3C: case 0x3D: case 0x40: case 0x41:
+        case 0x42: case 0x43: case 0x44: case 0x45:
             return Type.CANAL;
         default:
             return Type.LOW;
