@@ -31,7 +31,7 @@ public class SC2Map
     Map<String, Segment> segments;
     int fileSize;
     
-    AltitudeMap altitudeMap;
+    TerrainMap altitudeMap;
     StructureMap structureMap;
     
     protected SC2Map(int fileSize)
@@ -80,7 +80,7 @@ public class SC2Map
 
         xbld.decompressData();
 
-        map.altitudeMap = new AltitudeMap(altm.getRawData(), xter.getDecompressedData());
+        map.altitudeMap = new TerrainMap(altm.getRawData(), xter.getDecompressedData());
         map.structureMap = new StructureMap(xbld.getDecompressedData());
         
         return map;
@@ -114,7 +114,7 @@ public class SC2Map
         return Collections.unmodifiableCollection(segments.values());
     }
     
-    public AltitudeMap getAltitudeMap()
+    public TerrainMap getTerrainMap()
     {
         return altitudeMap;
     }
