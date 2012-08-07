@@ -30,12 +30,6 @@ public class SC2MC
     static String input = "C:/Program Files (x86)/GOG.com/SimCity 2000 Special Edition/CUSTOM/TESTMAP.SC2";
     static String output = "C:/Users/My Computer/AppData/Roaming/.minecraft/saves/sc2test";
 
-    static final int width = 128;
-    static final int height = 128;
-    static final int grid_scale = 16;
-    
-    static Random rand = new Random(0);
-    
     public static void main(String[] args) throws IOException
     {
         SC2Map map = SC2Map.loadMap(new FileInputStream(new File(input)));
