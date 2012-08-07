@@ -102,8 +102,8 @@ public class Converter
 
     protected int getScaledAltitude(int x, int y)
     {
-        float xs = (width >> 1) + x / (float)grid_scale;
-        float ys = (height >> 1) + y / (float)grid_scale;
+        float xs = (width >> 1) + (x + 0.5f) / grid_scale;
+        float ys = (height >> 1) + (y + 0.5f) / grid_scale;
         return (int)(map.getTerrainMap().getSmoothAltitude(xs, ys) * grid_scale);
     }
     

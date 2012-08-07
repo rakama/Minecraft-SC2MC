@@ -38,6 +38,11 @@ public class StructureMap
         return height;
     }
 
+    public boolean isRoad(int x, int y)
+    {
+        return false;
+    }
+    
     public boolean isEmptyLot(int x, int y)
     {
         return getStructureID(x, y) == 0;

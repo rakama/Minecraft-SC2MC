@@ -131,9 +131,9 @@ public class TerrainMap
         int index = toIndex(xi, yi);
         float altitude = terrainAltitude[index];
         Type type = terrainType[index];
-        Rotation rotation = terrainRotation[index];
+        Rotation rotation = terrainRotation[index];        
+        boolean underwater = terrainUnderwater[index];
         
-        float temp;
         float xf = x - xi;
         float yf = y - yi;
 
@@ -146,49 +146,51 @@ public class TerrainMap
         if(isFlooded(xi, yi) && hasAdjacentCanal(xi, yi))
             canalAltitude -= getCanalDepth(xi, yi, xf, yf);
 
+        float swap;
+        
         // find grid rotation
         switch(rotation)
         {
         case CLOCKWISE90:
-            temp = xf;
+            swap = xf;
             xf = yf;
-            yf = 1 - temp;
+            yf = 1 - swap;
             break;
         case CLOCKWISE180:
             xf = 1 - xf;
             yf = 1 - yf;
             break;
         case CLOCKWISE270:
-            temp = xf;
+            swap = xf;
             xf = 1 - yf;
-            yf = temp;
+            yf = swap;
             break;
         }
-
+        
         // find altitude for this grid
         switch(type)
         {
         case LOW:
-        case WATERFALL:
             break;
         case HIGH:
             altitude++;
             break;
         case SLOPE:
-            altitude += 1 - yf;
+            if(underwater)
+                altitude += getFloodedSlope(xf, yf);
+            else
+                altitude += getSlope(xf, yf);
             break;
         case CORNER_LOW:
-            if(terrainUnderwater[index])
-                altitude += getQuadraticCornerLow(xf, yf);
-            else if(yf > xf)
-                altitude += getCornerLow(xf, yf);
+            if(underwater)
+                altitude += getFloodedCornerLow(xf, yf);
             else
-                altitude++;
+                altitude += getCornerLow(xf, yf);
             break;
         case CORNER_HIGH:
-            if(terrainUnderwater[index])
-                altitude += getQuadraticCornerHigh(xf, yf);
-            else if(yf < xf)
+            if(underwater)
+                altitude += getFloodedCornerHigh(xf, yf);
+            else
                 altitude += getCornerHigh(xf, yf);
             break;
         }
@@ -247,11 +249,11 @@ public class TerrainMap
     private float canalDepthHelper(float xf, float yf, boolean c1, boolean c2, boolean c3)
     {
         if(c1 && c3)
-            return 1 - getQuadraticCornerLow(1 - xf, yf);
+            return 1 - getFloodedCornerLow(1 - xf, yf);
         else if(c1)
-            return yf;
+            return 1 - getFloodedSlope(1 - xf, yf);
         else if(c2)
-            return 1 - getQuadraticCornerHigh(1 - xf, yf);
+            return 1 - getFloodedCornerHigh(1 - xf, yf);
         
         return 1;
     }
@@ -271,25 +273,41 @@ public class TerrainMap
         else
             return isFlooded(x, y);
     }
+
+    protected static float getSlope(float xf, float yf)
+    {
+        return 1 - yf;
+    }
     
     protected static float getCornerLow(float xf, float yf)
     {
-        return 1 - yf + xf;
+        if(yf > xf)
+            return 1 - yf + xf;
+        else
+            return 1;
     }
 
     protected static float getCornerHigh(float xf, float yf)
     {
-        return xf - yf;
-    }
-    
-    protected static float getQuadraticCornerLow(float xf, float yf)
-    {
-        return (float)Math.min(1, (1 - xf) * (1 - yf) + xf * (1 - yf) + xf * yf + 0.05);
+        if(yf < xf)
+            return xf - yf;
+        else
+            return 0;
     }
 
-    protected static float getQuadraticCornerHigh(float xf, float yf)
+    protected static float getFloodedSlope(float xf, float yf)
     {
-        return (float)Math.min(1, (1 - yf) * xf + 0.05);
+        return 1 - yf + 0.05f;
+    }
+    
+    protected static float getFloodedCornerLow(float xf, float yf)
+    {
+        return (float)Math.min(1, (1 - xf) * (1 - yf) + xf * (1 - yf) + xf * yf + 0.04f);
+    }
+
+    protected static float getFloodedCornerHigh(float xf, float yf)
+    {
+        return (float)Math.min(1, (1 - yf) * xf * 1.05f + 0.02f);
     }
         
     protected static int toIndex(int x, int y)
