@@ -46,11 +46,11 @@ public class Converter
     {
         for(int y=0; y<height; y++)
         {
-            if(verbose)
-                log("Generating... " + getPercentage(y + 1) + "% complete");
-            
             for(int x=0; x<width; x++)
                 renderGrid(x, y);
+            
+            if(verbose)
+                log("Generating... " + getPercentage(y + 1) + "% complete");            
         }
     }
     

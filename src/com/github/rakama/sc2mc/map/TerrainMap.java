@@ -24,21 +24,7 @@ public class TerrainMap
     
     protected enum Rotation{NONE, CLOCKWISE90, CLOCKWISE180, CLOCKWISE270};    
     protected enum Type{HIGH, LOW, SLOPE, CORNER_HIGH, CORNER_LOW, WATERFALL, CANAL};
-    
-    protected static final Rotation[] xterRotation = {Rotation.NONE,
-        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
-        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
-        Rotation.NONE, Rotation.CLOCKWISE90, Rotation.CLOCKWISE180, Rotation.CLOCKWISE270,
-        Rotation.NONE, Rotation.NONE, Rotation.NONE
-    };
-
-    protected static final Type[] xterSlope = {Type.LOW,
-        Type.SLOPE, Type.SLOPE, Type.SLOPE, Type.SLOPE, 
-        Type.CORNER_LOW, Type.CORNER_LOW, Type.CORNER_LOW, Type.CORNER_LOW, 
-        Type.CORNER_HIGH, Type.CORNER_HIGH, Type.CORNER_HIGH, Type.CORNER_HIGH, 
-        Type.HIGH, Type.LOW, Type.LOW
-    };
-    
+        
     protected int[] terrainAltitude;
     protected int[] waterAltitude;
     protected Type[] terrainType;
@@ -137,18 +123,18 @@ public class TerrainMap
         float xf = x - xi;
         float yf = y - yi;
 
-        // treat grid like canal
+        // handle canal separately
         if(type == Type.CANAL || type == Type.WATERFALL)
             return altitude - getCanalDepth(xi, yi, xf, yf);
 
-        // find altitude to bridge neighboring canals
+        // find altitude to connect with neighboring canals
         float canalAltitude = altitude + 1;
         if(isFlooded(xi, yi) && hasAdjacentCanal(xi, yi))
             canalAltitude -= getCanalDepth(xi, yi, xf, yf);
 
         float swap;
         
-        // find grid rotation
+        // find rotation
         switch(rotation)
         {
         case CLOCKWISE90:
@@ -167,7 +153,7 @@ public class TerrainMap
             break;
         }
         
-        // find altitude for this grid
+        // find altitude at this location
         switch(type)
         {
         case LOW:
@@ -195,7 +181,7 @@ public class TerrainMap
             break;
         }
 
-        // if canal exists, "carve" it into the grid
+        // if neighboring canal exists, "carve" a connection
         return Math.min(altitude, canalAltitude);
     }
     
@@ -203,6 +189,9 @@ public class TerrainMap
     {        
         float depth = canal_depth;
 
+        // c2 c1
+        // c3 *
+        
         // no rotation
         boolean c1 = !isFloodedHelper(x, y - 1);
         boolean c2 = !isFloodedHelper(x - 1, y - 1);
@@ -257,14 +246,6 @@ public class TerrainMap
         
         return 1;
     }
-
-    private boolean isCanalHelper(int x, int y)
-    {
-        if(x < 0 || x >= width || y < 0 || y >= height)
-            return true;
-        else
-            return isCanal(x, y);
-    }
     
     private boolean isFloodedHelper(int x, int y)
     {
@@ -272,6 +253,14 @@ public class TerrainMap
             return true;
         else
             return isFlooded(x, y);
+    }
+
+    private boolean isCanalHelper(int x, int y)
+    {
+        if(x < 0 || x >= width || y < 0 || y >= height)
+            return true;
+        else
+            return isCanal(x, y);
     }
 
     protected static float getSlope(float xf, float yf)
@@ -312,7 +301,7 @@ public class TerrainMap
         
     protected static int toIndex(int x, int y)
     {
-        return x + (y << 7);
+        return (127 - x) + (y << 7);
     }
 
     protected static void checkBounds(int x, int y)
@@ -328,42 +317,69 @@ public class TerrainMap
     
     private static Type computeType(byte[] xter, int x, int y)
     {
-        int index = (127 - x) + (y << 7);
-        int type = xter[index];
-        if(type == 0x3E)
+        switch(xter[toIndex(x, y)])
+        {
+        case 0x01: case 0x02: case 0x03: case 0x04:
+        case 0x11: case 0x12: case 0x13: case 0x14:
+        case 0x21: case 0x22: case 0x23: case 0x24:
+            return Type.SLOPE;
+        case 0x05: case 0x06: case 0x07: case 0x08:
+        case 0x15: case 0x16: case 0x17: case 0x18:
+        case 0x25: case 0x26: case 0x27: case 0x28:
+            return Type.CORNER_LOW;
+        case 0x09: case 0x0A: case 0x0B: case 0x0C:
+        case 0x19: case 0x1A: case 0x1B: case 0x1C:
+        case 0x29: case 0x2A: case 0x2B: case 0x2C:
+            return Type.CORNER_HIGH;
+        case 0x0D: case 0x1D: case 0x2D:
+            return Type.HIGH;
+        case 0x3E:
             return Type.WATERFALL;
-        else if(type >= 0x30 && type <= 0x3D)
+        case 0x31: case 0x32: case 0x33: case 0x34:
+        case 0x35: case 0x36: case 0x37: case 0x38:
+        case 0x39: case 0x3A: case 0x3B: case 0x3C:
+        case 0x3D: case 0x40: case 0x41: case 0x42:
+        case 0x43: case 0x44: case 0x45:
             return Type.CANAL;
-        else if(type == 0x40 || type == 0x41)
-            return Type.CANAL;
-        else if(type >= 0x42 && type <= 0x45)
-            return Type.CANAL;
-        else
-            return xterSlope[0xF & type];
+        default:
+            return Type.LOW;
+        }
     }
 
     private static Rotation computeRotation(byte[] xter, int x, int y)
     {
-        int index = (127 - x) + (y << 7);
-        int type = xter[index];
-        return xterRotation[0xF & type];
+        switch(xter[toIndex(x, y)])
+        {
+        case 0x02: case 0x06: case 0x0A:
+        case 0x12: case 0x16: case 0x1A:
+        case 0x22: case 0x26: case 0x2A:
+            return Rotation.CLOCKWISE90;
+        case 0x03: case 0x07: case 0x0B:
+        case 0x13: case 0x17: case 0x1B:
+        case 0x23: case 0x27: case 0x2B:
+            return Rotation.CLOCKWISE180;
+        case 0x04: case 0x08: case 0x0C:
+        case 0x14: case 0x18: case 0x1C:
+        case 0x24: case 0x28: case 0x2C:
+            return Rotation.CLOCKWISE270;
+        default:
+            return Rotation.NONE;
+        }
     }
-
+    
     private static boolean computeUnderwater(byte[] xter, int x, int y)
     {
-        int index = (127 - x) + (y << 7);
-        return (xter[index] & 0x30) != 0;        
+        return (xter[toIndex(x, y)] & 0x30) != 0;        
     }
 
     private static int computeTerrainAltitude(byte[] altm, int x, int y)
     {
-        int index = (127 - x) + (y << 7);
-        return altm[index * 2 + 1] & 0xF;
+        return altm[toIndex(x, y) * 2 + 1] & 0xF;
     }
     
     private static int computeWaterAltitude(byte[] altm, int x, int y)
     {
-        int index = (127 - x) + (y << 7);
+        int index = toIndex(x, y);
         int byte1 = altm[index * 2] & 0xFF;
         int byte2 = altm[index * 2 + 1] & 0xFF;
         int val = byte2 | (byte1 << 8);

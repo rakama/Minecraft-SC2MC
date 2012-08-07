@@ -3,7 +3,6 @@ package com.github.rakama.sc2mc;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Random;
 
 import com.github.rakama.sc2mc.map.SC2Map;
 import com.github.rakama.worldtools.WorldTools;
@@ -40,6 +39,9 @@ public class SC2MC
         BlockCanvas canvas = tools.createCanvas();
         Converter converter = new Converter(map, canvas);
         converter.convert(true);
+
+        System.out.println("Saving open chunks ...");
+        
         tools.closeAll();
         
         System.out.println("Finished!");  
