@@ -18,14 +18,24 @@ package com.github.rakama.sc2mc.map;
 
 public class StructureMap
 {    
-    public static final int width = 128;
-    public static final int height = 128;
+    protected static final int width = 128;
+    protected static final int height = 128;
     
-    byte[] structure;
+    protected byte[] structure;
     
     protected StructureMap(byte[] xbld)
     {
         structure = xbld;
+    }
+
+    public int getWidth()
+    {
+        return width;
+    }
+    
+    public int getHeight()
+    {
+        return height;
     }
 
     public boolean isEmptyLot(int x, int y)

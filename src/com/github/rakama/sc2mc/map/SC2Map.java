@@ -28,11 +28,11 @@ import com.github.rakama.sc2mc.io.Segment;
 
 public class SC2Map
 {
-    Map<String, Segment> segments;
-    int fileSize;
+    protected Map<String, Segment> segments;
+    protected int fileSize;
     
-    TerrainMap altitudeMap;
-    StructureMap structureMap;
+    protected TerrainMap terrainMap;
+    protected StructureMap structureMap;
     
     protected SC2Map(int fileSize)
     {
@@ -80,7 +80,7 @@ public class SC2Map
 
         xbld.decompressData();
 
-        map.altitudeMap = new TerrainMap(altm.getRawData(), xter.getDecompressedData());
+        map.terrainMap = new TerrainMap(altm.getRawData(), xter.getDecompressedData());
         map.structureMap = new StructureMap(xbld.getDecompressedData());
         
         return map;
@@ -116,7 +116,7 @@ public class SC2Map
     
     public TerrainMap getTerrainMap()
     {
-        return altitudeMap;
+        return terrainMap;
     }
     
     public StructureMap getStructureMap()

@@ -18,9 +18,9 @@ package com.github.rakama.sc2mc.map;
 
 public class TerrainMap
 {
-    public static final int width = 128;
-    public static final int height = 128;    
-    static final float canal_depth = 0.3f;
+    protected static final int width = 128;
+    protected static final int height = 128;    
+    protected static final float canal_depth = 0.3f;
     
     protected enum Rotation{NONE, CLOCKWISE90, CLOCKWISE180, CLOCKWISE270};    
     protected enum Type{HIGH, LOW, SLOPE, CORNER_HIGH, CORNER_LOW, WATERFALL, CANAL};

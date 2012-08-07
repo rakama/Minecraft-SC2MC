@@ -27,17 +27,15 @@ import com.github.rakama.worldtools.data.Block;
 
 public class Converter
 {
-    public static final int width = 128;
-    public static final int height = 128;
-    public static final int grid_scale = 16;
-    
-    static Converter instance;
+    protected static final int width = 128;
+    protected static final int height = 128;
+    protected static final int grid_scale = 16;
     
     protected Random rand;
     protected BlockCanvas canvas;
     protected SC2Map map;
     
-    protected Converter(SC2Map map, BlockCanvas canvas)
+    public Converter(SC2Map map, BlockCanvas canvas)
     {
         this.map = map;
         this.canvas = canvas;
