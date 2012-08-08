@@ -1,9 +1,4 @@
-package com.github.rakama.sc2mc.io;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -18,6 +13,11 @@ import java.io.InputStream;
  * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
  */
+
+package com.github.rakama.sc2mc.io;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SegInputStream
 {

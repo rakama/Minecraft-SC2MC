@@ -1,14 +1,4 @@
-package com.github.rakama.sc2mc;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import com.github.rakama.sc2mc.map.SC2Map;
-import com.github.rakama.worldtools.WorldTools;
-import com.github.rakama.worldtools.canvas.BlockCanvas;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -24,9 +14,19 @@ import com.github.rakama.worldtools.canvas.BlockCanvas;
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.github.rakama.sc2mc;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import com.github.rakama.sc2mc.map.SC2Map;
+import com.github.rakama.worldtools.WorldTools;
+import com.github.rakama.worldtools.canvas.BlockCanvas;
+
 public class SC2MC
 {
-    static String input = "C:/Program Files (x86)/GOG.com/SimCity 2000 Special Edition/CUSTOM/TESTMAP.SC2";
+    static String input = "C:/Program Files (x86)/GOG.com/SimCity 2000 Special Edition/CITIES/CAPEQUES.SC2";
     static String output = "C:/Users/My Computer/AppData/Roaming/.minecraft/saves/sc2test";
 
     public static void main(String[] args) throws IOException

@@ -1,6 +1,4 @@
-package com.github.rakama.sc2mc.map;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,6 +13,8 @@ package com.github.rakama.sc2mc.map;
  * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
  */
+
+package com.github.rakama.sc2mc.map;
 
 public class TerrainMap
 {
@@ -123,7 +123,7 @@ public class TerrainMap
         float xf = x - xi;
         float yf = y - yi;
 
-        // handle canal separately
+        // handle canals separately
         if(type == Type.CANAL || type == Type.WATERFALL)
             return altitude - getCanalDepth(xi, yi, xf, yf);
 
@@ -181,7 +181,7 @@ public class TerrainMap
             break;
         }
 
-        // if neighboring canal exists, "carve" a connection
+        // if neighboring canal exists, carve a connection
         return Math.min(altitude, canalAltitude);
     }
     
@@ -223,18 +223,6 @@ public class TerrainMap
         return depth;
     }
     
-    protected boolean hasAdjacentCanal(int x, int y)
-    {
-        return isCanalHelper(x + 1, y)
-            || isCanalHelper(x + 2, y + 1)
-            || isCanalHelper(x, y + 1)
-            || isCanalHelper(x - 1, y + 1)
-            || isCanalHelper(x - 1, y)
-            || isCanalHelper(x - 1, y - 1)
-            || isCanalHelper(x, y - 1)
-            || isCanalHelper(x + 1, y - 1);
-    }
-    
     private float canalDepthHelper(float xf, float yf, boolean c1, boolean c2, boolean c3)
     {
         if(c1 && c3)
@@ -253,6 +241,18 @@ public class TerrainMap
             return true;
         else
             return isFlooded(x, y);
+    }
+    
+    protected boolean hasAdjacentCanal(int x, int y)
+    {
+        return isCanalHelper(x + 1, y)
+            || isCanalHelper(x + 2, y + 1)
+            || isCanalHelper(x, y + 1)
+            || isCanalHelper(x - 1, y + 1)
+            || isCanalHelper(x - 1, y)
+            || isCanalHelper(x - 1, y - 1)
+            || isCanalHelper(x, y - 1)
+            || isCanalHelper(x + 1, y - 1);
     }
 
     private boolean isCanalHelper(int x, int y)

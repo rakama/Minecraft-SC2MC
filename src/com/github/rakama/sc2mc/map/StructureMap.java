@@ -1,6 +1,4 @@
-package com.github.rakama.sc2mc.map;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,6 +13,8 @@ package com.github.rakama.sc2mc.map;
  * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
  */
+
+package com.github.rakama.sc2mc.map;
 
 public class StructureMap
 {    
@@ -41,9 +41,35 @@ public class StructureMap
     public boolean isRoad(int x, int y)
     {
         int id = getStructureID(x, y);
-        return id >= 0x1D && id <= 0x2B;
+        return (id >= 0x1D && id <= 0x2B) 
+            || (id >= 0x43 && id <= 0x46) 
+            || (id >= 0x4B && id <= 0x4C);
+    }
+
+    public boolean isRail(int x, int y)
+    {
+        int id = getStructureID(x, y);
+        return (id >= 0x2C && id <= 0x3E) 
+            || (id >= 0x45 && id <= 0x48)
+            || (id >= 0x4D && id <= 0x4E);
+    }
+
+    public boolean isHighway(int x, int y)
+    {
+        int id = getStructureID(x, y);
+        return (id >= 0x49 && id <= 0x50) 
+            || (id >= 0x61 && id <= 0x69);
     }
     
+    public boolean isPowerline(int x, int y)
+    {
+        int id = getStructureID(x, y);
+        return (id >= 0x0E && id <= 0x1C)
+            || (id >= 0x43 && id <= 0x44)
+            || (id >= 0x47 && id <= 0x48)
+            || (id >= 0x4F && id <= 0x50);
+    }
+
     public boolean isEmptyLot(int x, int y)
     {
         return getStructureID(x, y) == 0;
@@ -53,7 +79,7 @@ public class StructureMap
     {
         int id = getStructureID(x, y);
         
-        if(id < 6 || id > 12)
+        if(id < 0x06 || id > 0x0C)
             return 0;
         
         return id - 5;

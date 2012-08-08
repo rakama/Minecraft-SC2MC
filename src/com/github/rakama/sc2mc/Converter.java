@@ -1,15 +1,4 @@
-package com.github.rakama.sc2mc;
-
-import java.util.Random;
-
-import com.github.rakama.sc2mc.map.SC2Map;
-import com.github.rakama.sc2mc.map.StructureMap;
-import com.github.rakama.sc2mc.map.TerrainMap;
-import com.github.rakama.worldtools.canvas.BlockCanvas;
-import com.github.rakama.worldtools.data.Biome;
-import com.github.rakama.worldtools.data.Block;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -24,6 +13,17 @@ import com.github.rakama.worldtools.data.Block;
  * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
  */
+
+package com.github.rakama.sc2mc;
+
+import java.util.Random;
+
+import com.github.rakama.sc2mc.map.SC2Map;
+import com.github.rakama.sc2mc.map.StructureMap;
+import com.github.rakama.sc2mc.map.TerrainMap;
+import com.github.rakama.worldtools.canvas.BlockCanvas;
+import com.github.rakama.worldtools.data.Biome;
+import com.github.rakama.worldtools.data.Block;
 
 public class Converter
 {
@@ -47,73 +47,83 @@ public class Converter
         for(int y=0; y<height; y++)
         {
             for(int x=0; x<width; x++)
-                renderGrid(x, y);
+                renderChunk(x, y);
             
             if(verbose)
                 log("Generating... " + getPercentage(y + 1) + "% complete");            
         }
     }
     
-    protected void renderGrid(int x0, int y0)
+    protected void renderChunk(int x0, int y0)
     {
-        int xStart = x0 * grid_scale - (width >> 1) * grid_scale;
-        int yStart = y0 * grid_scale - (height >> 1) * grid_scale;
-        int xEnd = xStart + grid_scale;
-        int yEnd = yStart + grid_scale;
-                
         TerrainMap terra = map.getTerrainMap();
-        int waterAltitude = terra.getWaterAltitude(x0, y0) * grid_scale;
-                
+        
         // generate terrain
-        for(int y=yStart; y<yEnd; y++)
-            for(int x=xStart; x<xEnd; x++)
-                renderColumn(x, y, getScaledAltitude(x, y), waterAltitude);
+        renderTerrain(x0, y0);
         
         // generate waterfalls
         if(terra.isWaterfall(x0, y0))
-            renderWaterfall(x0, y0, terra.getTerrainAltitude(x0, y0));
+            renderWaterfall(x0, y0);
         
-        StructureMap struct = map.getStructureMap();        
+        StructureMap struct = map.getStructureMap();
+
+        // generate shrub
         if(struct.isEmptyLot(x0, y0))
-        {
-            // generate shrub
-            if(!terra.isFlooded(x0, y0) && rand.nextDouble() < 0.02)
-            {
-                int x = xStart + rand.nextInt(grid_scale);
-                int y = yStart + rand.nextInt(grid_scale);
-                canvas.setBlock(x, getScaledAltitude(x, y), y, Block.SHRUB);
-            }
-            
-            return;
-        }
+            renderEmptyLot(x0, y0);
         
-        int treeDensity = struct.getTreeDensity(x0, y0);
-        int numTrees = (int)Math.floor(treeDensity * 1.5);
+        // generate roads
+        if(struct.isRoad(x0, y0))
+            renderRoad(x0, y0);
+
+        // generate highway
+        if(struct.isHighway(x0, y0))
+            renderHighway(x0, y0);
+
+        // generate rail
+        if(struct.isRail(x0, y0))
+            renderRail(x0, y0);
+
+        // generate powerline
+        if(struct.isPowerline(x0, y0))
+            renderPowerline(x0, y0);
         
         // generate trees
+        int numTrees = (int)(struct.getTreeDensity(x0, y0) * 1.5);        
         for(int i=0; i<numTrees; i++)
-        {
-            int x = xStart + rand.nextInt(grid_scale);
-            int y = yStart + rand.nextInt(grid_scale);
-            int height = 6 + rand.nextInt(4);
-            renderTree(x, y, getScaledAltitude(x, y), height);
-        }
-    }
-
-    protected int getScaledAltitude(int x, int y)
-    {
-        float xs = (width >> 1) + (x + 0.5f) / grid_scale;
-        float ys = (height >> 1) + (y + 0.5f) / grid_scale;
-        return (int)(map.getTerrainMap().getSmoothAltitude(xs, ys) * grid_scale);
+            renderTree(x0, y0);
     }
     
-    protected void renderWaterfall(int x0, int y0, int altitude)
+    protected void renderTerrain(int x0, int y0)
     {
-        int xStart = x0 * grid_scale - (width >> 1) * grid_scale;
-        int yStart = y0 * grid_scale - (height >> 1) * grid_scale;
+        int xStart = getScaledCoordinate(x0, width);
+        int yStart = getScaledCoordinate(y0, height);
         int xEnd = xStart + grid_scale;
         int yEnd = yStart + grid_scale;
-        int altStart = altitude * grid_scale - 1;
+                                
+        // generate terrain
+        for(int y=yStart; y<yEnd; y++)
+            for(int x=xStart; x<xEnd; x++)
+                renderColumn(x, y, getScaledAltitude(x, y), getScaledWaterAltitude(x, y));
+    }
+
+    protected void renderEmptyLot(int x0, int y0)
+    {
+        if(map.getTerrainMap().isFlooded(x0, y0) || rand.nextDouble() > 0.02)
+            return;
+
+        int x = getScaledCoordinate(x0, width) + rand.nextInt(grid_scale);
+        int y = getScaledCoordinate(y0, height) + rand.nextInt(grid_scale);
+        
+        canvas.setBlock(x, getScaledAltitude(x, y), y, Block.SHRUB);
+    }
+    
+    protected void renderWaterfall(int x0, int y0)
+    {
+        int xStart = getScaledCoordinate(x0, width);
+        int yStart = getScaledCoordinate(y0, height);
+        int xEnd = xStart + grid_scale;
+        int yEnd = yStart + grid_scale;
+        int altStart = map.getTerrainMap().getTerrainAltitude(x0, y0) * grid_scale - 1;
         int altEnd = altStart + grid_scale;
                 
         for(int y=yStart; y<yEnd; y++)
@@ -130,8 +140,14 @@ public class Converter
         }
     }
 
-    protected void renderTree(int x, int y, int altitude, int height)
-    {        
+    protected void renderTree(int x0, int y0)
+    {                   
+        int x = getScaledCoordinate(x0, width) + rand.nextInt(grid_scale);
+        int y = getScaledCoordinate(y0, height) + rand.nextInt(grid_scale);
+        int height = 6 + rand.nextInt(4);
+        
+        int altitude = getScaledAltitude(x, y);
+        
         // leaves around trunk
         for(int i=2; i<height; i++)
             for(int j=0; j<3; j++)
@@ -151,6 +167,49 @@ public class Converter
             canvas.setBlock(x, altitude - 1, y, Block.DIRT);        
     }
 
+    protected void renderRail(int x0, int y0)
+    {
+        // TODO: not yet implemented                
+    }
+
+    protected void renderPowerline(int x0, int y0)
+    {
+        // TODO: not yet implemented
+    }
+    
+    protected void renderRoad(int x0, int y0)
+    {
+        // TODO: not yet implemented
+
+        int xStart = getScaledCoordinate(x0, width);
+        int yStart = getScaledCoordinate(y0, height);
+        int xEnd = xStart + grid_scale;
+        int yEnd = yStart + grid_scale;
+        
+        // generate concrete
+        for(int y=yStart; y<yEnd; y++)
+            for(int x=xStart; x<xEnd; x++)
+                canvas.setBlock(x, getScaledAltitude(x, y) - 1, y, Block.STONE);
+    }
+
+    protected void renderHighway(int x0, int y0)
+    {
+        // TODO: not yet implemented
+
+        int xStart = getScaledCoordinate(x0, width);
+        int yStart = getScaledCoordinate(y0, height);
+        int xEnd = xStart + grid_scale;
+        int yEnd = yStart + grid_scale;
+
+        TerrainMap terra = map.getTerrainMap();
+        int waterAlt = terra.getWaterAltitude(x0, y0) * grid_scale;
+                
+        // generate elevated road
+        for(int y=yStart; y<yEnd; y++)
+            for(int x=xStart; x<xEnd; x++)
+                canvas.setBlock(x, Math.max(waterAlt, getScaledAltitude(x, y)) + 16, y, Block.STONE);
+    }
+    
     protected void renderColumn(int x, int y, int terrainAltitude, int waterAltitude)
     {        
         for(int height=1; height<terrainAltitude; height++)
@@ -173,6 +232,25 @@ public class Converter
             return Block.STONE;
     }    
 
+    protected int getScaledCoordinate(int p0, int size)
+    {
+        return p0 * grid_scale - (size >> 1) * grid_scale;
+    }
+    
+    protected int getScaledAltitude(int x, int y)
+    {
+        float xs = (width >> 1) + (x + 0.5f) / grid_scale;
+        float ys = (height >> 1) + (y + 0.5f) / grid_scale;
+        return (int)(map.getTerrainMap().getSmoothAltitude(xs, ys) * grid_scale);
+    }
+
+    protected int getScaledWaterAltitude(int x, int y)
+    {
+        int xs = (width >> 1) + x / grid_scale;
+        int ys = (height >> 1) + y / grid_scale;
+        return map.getTerrainMap().getWaterAltitude(xs, ys) * grid_scale;
+    }
+    
     protected boolean isBuried(int x, int y, int z)
     {
         return canvas.getBlock(x - 1, y, z).isOpaque()

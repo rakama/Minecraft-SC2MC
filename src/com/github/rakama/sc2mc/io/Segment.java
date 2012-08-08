@@ -1,6 +1,4 @@
-package com.github.rakama.sc2mc.io;
-
-/**
+/*
  * Copyright (c) 2012, RamsesA <ramsesakama@gmail.com>
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,6 +13,8 @@ package com.github.rakama.sc2mc.io;
  * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  * PERFORMANCE OF THIS SOFTWARE.
  */
+
+package com.github.rakama.sc2mc.io;
 
 public class Segment
 {
