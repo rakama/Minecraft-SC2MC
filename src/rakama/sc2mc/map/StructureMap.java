@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.github.rakama.sc2mc.map;
+package rakama.sc2mc.map;
 
 public class StructureMap
 {    

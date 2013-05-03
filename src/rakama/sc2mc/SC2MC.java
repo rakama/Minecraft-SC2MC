@@ -14,15 +14,17 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.github.rakama.sc2mc;
+package rakama.sc2mc;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.github.rakama.sc2mc.map.SC2Map;
-import com.github.rakama.worldtools.WorldTools;
-import com.github.rakama.worldtools.canvas.BlockCanvas;
+import rakama.sc2mc.map.SC2Map;
+
+import rakama.worldtools.WorldManager;
+import rakama.worldtools.WorldTools;
+import rakama.worldtools.canvas.BlockCanvas;
 
 public class SC2MC
 {
@@ -32,17 +34,17 @@ public class SC2MC
     public static void main(String[] args) throws IOException
     {
         SC2Map map = SC2Map.loadMap(new FileInputStream(new File(input)));
-        WorldTools tools = WorldTools.getInstance(new File(output));
+        WorldManager manager = WorldTools.getWorldManager(new File(output));
                 
         System.out.println("Reticulating mines...");
 
-        BlockCanvas canvas = tools.createCanvas();
+        BlockCanvas canvas = manager.getCanvas();
         Converter converter = new Converter(map, canvas);
         converter.convert(true);
 
         System.out.println("Saving open chunks ...");
         
-        tools.closeAll();
+        manager.closeAll();
         
         System.out.println("Finished!");  
     }

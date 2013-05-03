@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.github.rakama.sc2mc.io;
+package rakama.sc2mc.io;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.github.rakama.sc2mc.map;
+package rakama.sc2mc.map;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.rakama.sc2mc.io.SegInputStream;
-import com.github.rakama.sc2mc.io.Segment;
+import rakama.sc2mc.io.SegInputStream;
+import rakama.sc2mc.io.Segment;
 
 public class SC2Map
 {

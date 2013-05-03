@@ -14,16 +14,17 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.github.rakama.sc2mc;
+package rakama.sc2mc;
 
 import java.util.Random;
 
-import com.github.rakama.sc2mc.map.SC2Map;
-import com.github.rakama.sc2mc.map.StructureMap;
-import com.github.rakama.sc2mc.map.TerrainMap;
-import com.github.rakama.worldtools.canvas.BlockCanvas;
-import com.github.rakama.worldtools.data.Biome;
-import com.github.rakama.worldtools.data.Block;
+import rakama.sc2mc.map.SC2Map;
+import rakama.sc2mc.map.StructureMap;
+import rakama.sc2mc.map.TerrainMap;
+
+import rakama.worldtools.canvas.BlockCanvas;
+import rakama.worldtools.data.Biome;
+import rakama.worldtools.data.Block;
 
 public class Converter
 {
