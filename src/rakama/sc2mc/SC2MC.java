@@ -21,10 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import rakama.sc2mc.map.SC2Map;
-
 import rakama.worldtools.WorldManager;
-import rakama.worldtools.WorldTools;
-import rakama.worldtools.canvas.BlockCanvas;
+import rakama.worldtools.canvas.WorldCanvas;
 
 public class SC2MC
 {
@@ -34,11 +32,11 @@ public class SC2MC
     public static void main(String[] args) throws IOException
     {
         SC2Map map = SC2Map.loadMap(new FileInputStream(new File(input)));
-        WorldManager manager = WorldTools.getWorldManager(new File(output));
+        WorldManager manager = WorldManager.getWorldManager(new File(output));
                 
         System.out.println("Reticulating mines...");
 
-        BlockCanvas canvas = manager.getCanvas();
+        WorldCanvas canvas = manager.getCanvas();
         Converter converter = new Converter(map, canvas);
         converter.convert(true);
 

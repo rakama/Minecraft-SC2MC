@@ -21,8 +21,8 @@ import java.util.Random;
 import rakama.sc2mc.map.SC2Map;
 import rakama.sc2mc.map.StructureMap;
 import rakama.sc2mc.map.TerrainMap;
-
 import rakama.worldtools.canvas.BlockCanvas;
+import rakama.worldtools.canvas.WorldCanvas;
 import rakama.worldtools.data.Biome;
 import rakama.worldtools.data.Block;
 
@@ -33,10 +33,10 @@ public class Converter
     protected static final int grid_scale = 16;
     
     protected Random rand;
-    protected BlockCanvas canvas;
+    protected WorldCanvas canvas;
     protected SC2Map map;
     
-    public Converter(SC2Map map, BlockCanvas canvas)
+    public Converter(SC2Map map, WorldCanvas canvas)
     {
         this.map = map;
         this.canvas = canvas;
